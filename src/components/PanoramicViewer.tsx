@@ -7,7 +7,7 @@ import basketballMuseumPanorama from '@/assets/basketball-museum-hd-panorama.jpg
 
 interface Hotspot {
   id: string;
-  position: [number, number, number];
+  position: [number, number, number]; // 3D world coordinates
   title: string;
   description: string;
   details: string;
@@ -16,28 +16,28 @@ interface Hotspot {
 const hotspots: Hotspot[] = [
   {
     id: 'jersey-display',
-    position: [45, -5, -8], // Front-right area
+    position: [100, 0, -200], // Front area
     title: 'Vintage Jerseys Collection',
     description: 'Historic basketball jerseys from legendary players',
     details: 'This display features authentic game-worn jerseys from basketball legends including Michael Jordan\'s Chicago Bulls #23, Magic Johnson\'s Lakers #32, and Larry Bird\'s Celtics #33. Each jersey represents a pivotal moment in basketball history.'
   },
   {
     id: 'trophy-case',
-    position: [-90, 10, -6], // Left wall
+    position: [-200, 20, -100], // Left area
     title: 'Championship Trophies',
     description: 'NBA Championship trophies and awards',
     details: 'The Larry O\'Brien Trophy collection showcasing championship victories from different eras. These trophies represent the pinnacle of basketball achievement and the dedication of championship teams.'
   },
   {
     id: 'basketball-collection',
-    position: [135, -10, 4], // Back-right area
+    position: [-100, -20, 200], // Back area
     title: 'Signed Basketball Collection',
     description: 'Game balls signed by basketball legends',
     details: 'A curated collection of basketballs signed by Hall of Fame players, including rare game balls from historic matches, All-Star games, and playoff series that defined basketball history.'
   },
   {
     id: 'poster-gallery',
-    position: [-135, 5, 2], // Back-left area
+    position: [200, 10, 100], // Right area
     title: 'Basketball Poster Gallery',
     description: 'Iconic basketball posters and memorabilia',
     details: 'Vintage promotional posters, championship banners, and rare photographs capturing the golden moments of basketball. These pieces showcase the evolution of the sport\'s visual culture.'
@@ -57,18 +57,30 @@ export const PanoramicViewer: React.FC = () => {
   
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [cameraRotation, setCameraRotation] = useState({ x: 0, y: 0 });
+  const [hotspotPositions, setHotspotPositions] = useState<{[key: string]: {x: number, y: number, visible: boolean}}>({});
 
-  // Convert spherical coordinates to screen position
-  const getScreenPosition = (longitude: number, latitude: number) => {
-    // Convert degrees to normalized coordinates (0-1)
-    const x = ((longitude + 180) % 360) / 360;
-    const y = (90 - latitude) / 180;
+  // Project 3D world position to 2D screen coordinates
+  const projectToScreen = (worldPosition: [number, number, number], camera: THREE.PerspectiveCamera) => {
+    const vector = new THREE.Vector3(...worldPosition);
+    vector.project(camera);
     
-    return {
-      left: `${x * 100}%`,
-      top: `${y * 100}%`
-    };
+    const x = (vector.x + 1) * window.innerWidth / 2;
+    const y = (-vector.y + 1) * window.innerHeight / 2;
+    const visible = vector.z < 1; // Check if in front of camera
+    
+    return { x, y, visible };
+  };
+
+  // Update hotspot positions based on camera view
+  const updateHotspotPositions = () => {
+    if (!cameraRef.current) return;
+    
+    const newPositions: {[key: string]: {x: number, y: number, visible: boolean}} = {};
+    hotspots.forEach(hotspot => {
+      const screenPos = projectToScreen(hotspot.position, cameraRef.current!);
+      newPositions[hotspot.id] = screenPos;
+    });
+    setHotspotPositions(newPositions);
   };
 
   useEffect(() => {
@@ -131,17 +143,11 @@ export const PanoramicViewer: React.FC = () => {
       const deltaX = event.clientX - previousMouseRef.current.x;
       const deltaY = event.clientY - previousMouseRef.current.y;
 
-      const newRotationY = camera.rotation.y - deltaX * 0.005;
-      const newRotationX = camera.rotation.x - deltaY * 0.005;
-
-      camera.rotation.y = newRotationY;
-      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, newRotationX));
+      camera.rotation.y -= deltaX * 0.005;
+      camera.rotation.x -= deltaY * 0.005;
       
-      // Update state for hotspot positioning
-      setCameraRotation({
-        x: camera.rotation.x,
-        y: camera.rotation.y
-      });
+      // Limit vertical rotation
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
 
       previousMouseRef.current = {
         x: event.clientX,
@@ -176,6 +182,7 @@ export const PanoramicViewer: React.FC = () => {
     // Animation loop
     const animate = () => {
       animationRef.current = requestAnimationFrame(animate);
+      updateHotspotPositions();
       renderer.render(scene, camera);
     };
     animate();
@@ -264,13 +271,17 @@ export const PanoramicViewer: React.FC = () => {
 
       {/* Hotspots */}
       {hotspots.map((hotspot) => {
-        const screenPos = getScreenPosition(hotspot.position[0], hotspot.position[1]);
+        const position = hotspotPositions[hotspot.id];
+        if (!position || !position.visible) return null;
         
         return (
           <div
             key={hotspot.id}
-            className="fixed w-8 h-8 cursor-pointer transform -translate-x-4 -translate-y-4 z-10 pointer-events-auto"
-            style={screenPos}
+            className="absolute w-8 h-8 cursor-pointer transform -translate-x-4 -translate-y-4 z-10 pointer-events-auto"
+            style={{
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+            }}
             onClick={() => setSelectedHotspot(hotspot)}
           >
             <div className="relative">
