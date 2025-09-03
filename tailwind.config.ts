@@ -52,6 +52,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				museum: {
+					dark: 'hsl(var(--museum-dark))',
+					card: 'hsl(var(--museum-card))',
+					gold: 'hsl(var(--museum-gold))',
+					'gold-muted': 'hsl(var(--museum-gold-muted))',
+					text: 'hsl(var(--museum-text))',
+					'text-muted': 'hsl(var(--museum-text-muted))',
+					border: 'hsl(var(--museum-border))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -62,6 +71,19 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			backgroundImage: {
+				'gradient-gold': 'var(--gradient-gold)',
+				'gradient-dark': 'var(--gradient-dark)',
+				'gradient-overlay': 'var(--gradient-overlay)'
+			},
+			boxShadow: {
+				'gold': 'var(--shadow-gold)',
+				'premium': 'var(--shadow-premium)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'var(--transition-smooth)',
+				'bounce': 'var(--transition-bounce)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

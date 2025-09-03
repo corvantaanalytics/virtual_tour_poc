@@ -8,35 +8,59 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 45 100% 65%;
+    --primary-foreground: 0 0% 10%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 95% 55%;
+    --accent-foreground: 0 0% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 45 100% 65%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Museum Design System */
+    --museum-dark: 0 0% 8%;
+    --museum-card: 0 0% 12%;
+    --museum-gold: 45 100% 65%;
+    --museum-gold-muted: 45 85% 55%;
+    --museum-text: 0 0% 98%;
+    --museum-text-muted: 0 0% 75%;
+    --museum-border: 0 0% 20%;
+    
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 65%) 0%, hsl(45 85% 55%) 100%);
+    --gradient-dark: linear-gradient(135deg, hsl(0 0% 8%) 0%, hsl(0 0% 12%) 100%);
+    --gradient-overlay: linear-gradient(135deg, hsl(0 0% 8% / 0.8) 0%, hsl(0 0% 12% / 0.9) 100%);
+    
+    /* Shadows */
+    --shadow-gold: 0 10px 30px -5px hsl(45 100% 65% / 0.3);
+    --shadow-premium: 0 20px 40px -10px hsl(0 0% 0% / 0.5);
+    
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
