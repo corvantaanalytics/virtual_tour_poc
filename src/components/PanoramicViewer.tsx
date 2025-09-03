@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { Card } from '@/components/ui/card';
 import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import basketballMuseumPanorama from '@/assets/basketball-museum-hd-panorama.jpg';
+import basketballMuseumPanorama from '@/assets/basketball.png';
 
 interface Hotspot {
   id: string;
