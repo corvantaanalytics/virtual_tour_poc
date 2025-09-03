@@ -11,6 +11,7 @@ interface Hotspot {
   title: string;
   description: string;
   details: string;
+  url?: string; // Optional URL to open in new tab
 }
 
 const hotspots: Hotspot[] = [
@@ -19,28 +20,32 @@ const hotspots: Hotspot[] = [
     position: [100, 0, -200], // Front area
     title: 'Vintage Jerseys Collection',
     description: 'Historic basketball jerseys from legendary players',
-    details: 'This display features authentic game-worn jerseys from basketball legends including Michael Jordan\'s Chicago Bulls #23, Magic Johnson\'s Lakers #32, and Larry Bird\'s Celtics #33. Each jersey represents a pivotal moment in basketball history.'
+    details: 'This display features authentic game-worn jerseys from basketball legends including Michael Jordan\'s Chicago Bulls #23, Magic Johnson\'s Lakers #32, and Larry Bird\'s Celtics #33. Each jersey represents a pivotal moment in basketball history.',
+    url: 'https://a.co/d/dXXsKlq'
   },
   {
     id: 'trophy-case',
     position: [-200, 20, -100], // Left area
     title: 'Championship Trophies',
     description: 'NBA Championship trophies and awards',
-    details: 'The Larry O\'Brien Trophy collection showcasing championship victories from different eras. These trophies represent the pinnacle of basketball achievement and the dedication of championship teams.'
+    details: 'The Larry O\'Brien Trophy collection showcasing championship victories from different eras. These trophies represent the pinnacle of basketball achievement and the dedication of championship teams.',
+    url: 'https://a.co/d/dXXsKlq'
   },
   {
     id: 'basketball-collection',
     position: [-100, -20, 200], // Back area
     title: 'Signed Basketball Collection',
     description: 'Game balls signed by basketball legends',
-    details: 'A curated collection of basketballs signed by Hall of Fame players, including rare game balls from historic matches, All-Star games, and playoff series that defined basketball history.'
+    details: 'A curated collection of basketballs signed by Hall of Fame players, including rare game balls from historic matches, All-Star games, and playoff series that defined basketball history.',
+    url: 'https://a.co/d/dXXsKlq'
   },
   {
     id: 'poster-gallery',
     position: [200, 10, 100], // Right area
     title: 'Basketball Poster Gallery',
     description: 'Iconic basketball posters and memorabilia',
-    details: 'Vintage promotional posters, championship banners, and rare photographs capturing the golden moments of basketball. These pieces showcase the evolution of the sport\'s visual culture.'
+    details: 'Vintage promotional posters, championship banners, and rare photographs capturing the golden moments of basketball. These pieces showcase the evolution of the sport\'s visual culture.',
+    url: 'https://a.co/d/dXXsKlq'
   }
 ];
 
@@ -274,6 +279,15 @@ export const PanoramicViewer: React.FC = () => {
         const position = hotspotPositions[hotspot.id];
         if (!position || !position.visible) return null;
         
+        const handleHotspotClick = () => {
+          if (hotspot.url) {
+            window.open(hotspot.url, '_blank', 'noopener,noreferrer');
+          } else {
+            // Fallback to modal for hotspots without URLs
+            setSelectedHotspot(hotspot);
+          }
+        };
+        
         return (
           <div
             key={hotspot.id}
@@ -282,7 +296,7 @@ export const PanoramicViewer: React.FC = () => {
               left: `${position.x}px`,
               top: `${position.y}px`,
             }}
-            onClick={() => setSelectedHotspot(hotspot)}
+            onClick={handleHotspotClick}
           >
             <div className="relative">
               <div className="w-8 h-8 rounded-full bg-museum-gold shadow-gold animate-pulse hover:scale-125 transition-smooth flex items-center justify-center border-2 border-museum-text">
@@ -328,7 +342,7 @@ export const PanoramicViewer: React.FC = () => {
           <div className="p-4">
             <h1 className="text-2xl font-bold text-museum-gold mb-2">Basketball Museum</h1>
             <p className="text-museum-text-muted text-sm">
-              Click and drag to explore • Scroll to zoom • Click golden hotspots to learn more
+              Click and drag to explore • Scroll to zoom • Click golden hotspots to visit Amazing Purchases
             </p>
           </div>
         </Card>
