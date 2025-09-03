@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { Card } from '@/components/ui/card';
 import { X, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import basketballMuseumPanorama from '@/assets/basketball-museum-panorama.jpg';
+import basketballMuseumPanorama from '@/assets/basketball-museum-hd-panorama.jpg';
 
 interface Hotspot {
   id: string;
@@ -16,28 +16,28 @@ interface Hotspot {
 const hotspots: Hotspot[] = [
   {
     id: 'jersey-display',
-    position: [2, 0, -8],
+    position: [45, -5, -8], // Front-right area
     title: 'Vintage Jerseys Collection',
     description: 'Historic basketball jerseys from legendary players',
     details: 'This display features authentic game-worn jerseys from basketball legends including Michael Jordan\'s Chicago Bulls #23, Magic Johnson\'s Lakers #32, and Larry Bird\'s Celtics #33. Each jersey represents a pivotal moment in basketball history.'
   },
   {
     id: 'trophy-case',
-    position: [-5, 1, -6],
+    position: [-90, 10, -6], // Left wall
     title: 'Championship Trophies',
     description: 'NBA Championship trophies and awards',
     details: 'The Larry O\'Brien Trophy collection showcasing championship victories from different eras. These trophies represent the pinnacle of basketball achievement and the dedication of championship teams.'
   },
   {
     id: 'basketball-collection',
-    position: [6, -1, 4],
+    position: [135, -10, 4], // Back-right area
     title: 'Signed Basketball Collection',
     description: 'Game balls signed by basketball legends',
     details: 'A curated collection of basketballs signed by Hall of Fame players, including rare game balls from historic matches, All-Star games, and playoff series that defined basketball history.'
   },
   {
     id: 'poster-gallery',
-    position: [-8, 0, 2],
+    position: [-135, 5, 2], // Back-left area
     title: 'Basketball Poster Gallery',
     description: 'Iconic basketball posters and memorabilia',
     details: 'Vintage promotional posters, championship banners, and rare photographs capturing the golden moments of basketball. These pieces showcase the evolution of the sport\'s visual culture.'
@@ -57,6 +57,19 @@ export const PanoramicViewer: React.FC = () => {
   
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [cameraRotation, setCameraRotation] = useState({ x: 0, y: 0 });
+
+  // Convert spherical coordinates to screen position
+  const getScreenPosition = (longitude: number, latitude: number) => {
+    // Convert degrees to normalized coordinates (0-1)
+    const x = ((longitude + 180) % 360) / 360;
+    const y = (90 - latitude) / 180;
+    
+    return {
+      left: `${x * 100}%`,
+      top: `${y * 100}%`
+    };
+  };
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -118,11 +131,17 @@ export const PanoramicViewer: React.FC = () => {
       const deltaX = event.clientX - previousMouseRef.current.x;
       const deltaY = event.clientY - previousMouseRef.current.y;
 
-      camera.rotation.y -= deltaX * 0.005;
-      camera.rotation.x -= deltaY * 0.005;
+      const newRotationY = camera.rotation.y - deltaX * 0.005;
+      const newRotationX = camera.rotation.x - deltaY * 0.005;
+
+      camera.rotation.y = newRotationY;
+      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, newRotationX));
       
-      // Limit vertical rotation
-      camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+      // Update state for hotspot positioning
+      setCameraRotation({
+        x: camera.rotation.x,
+        y: camera.rotation.y
+      });
 
       previousMouseRef.current = {
         x: event.clientX,
@@ -244,21 +263,30 @@ export const PanoramicViewer: React.FC = () => {
       </div>
 
       {/* Hotspots */}
-      {hotspots.map((hotspot) => (
-        <div
-          key={hotspot.id}
-          className="absolute w-6 h-6 cursor-pointer transform -translate-x-3 -translate-y-3 z-10"
-          style={{
-            left: `${50 + (Math.atan2(hotspot.position[0], hotspot.position[2]) * 180) / Math.PI * 2}%`,
-            top: `${50 - (Math.atan2(hotspot.position[1], Math.sqrt(hotspot.position[0] ** 2 + hotspot.position[2] ** 2)) * 180) / Math.PI * 2}%`,
-          }}
-          onClick={() => setSelectedHotspot(hotspot)}
-        >
-          <div className="w-6 h-6 rounded-full bg-museum-gold shadow-gold animate-pulse hover:scale-125 transition-smooth flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full bg-museum-text"></div>
+      {hotspots.map((hotspot) => {
+        const screenPos = getScreenPosition(hotspot.position[0], hotspot.position[1]);
+        
+        return (
+          <div
+            key={hotspot.id}
+            className="fixed w-8 h-8 cursor-pointer transform -translate-x-4 -translate-y-4 z-10 pointer-events-auto"
+            style={screenPos}
+            onClick={() => setSelectedHotspot(hotspot)}
+          >
+            <div className="relative">
+              <div className="w-8 h-8 rounded-full bg-museum-gold shadow-gold animate-pulse hover:scale-125 transition-smooth flex items-center justify-center border-2 border-museum-text">
+                <div className="w-4 h-4 rounded-full bg-museum-dark"></div>
+              </div>
+              {/* Glowing ring animation */}
+              <div className="absolute inset-0 w-8 h-8 rounded-full bg-museum-gold/30 animate-ping"></div>
+              {/* Label */}
+              <div className="absolute top-10 left-1/2 transform -translate-x-1/2 bg-museum-card/90 backdrop-blur-sm px-2 py-1 rounded text-xs text-museum-text whitespace-nowrap border border-museum-border">
+                {hotspot.title}
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* Information Panel */}
       {selectedHotspot && (
